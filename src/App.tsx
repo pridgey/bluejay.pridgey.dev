@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { lazy } from "react";
+import { parse } from "query-string";
+import { getUserToken } from "./utilities";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+export const App = () => {
+  const params = parse(window.location.search);
+  const userToken = getUserToken();
 
-export default App;
+  const HomeDirectory = lazy(() => import("./views/homeDirectory"));
+  const VoteSession = lazy(() => import("./views/voteSession"));
+  const EditSession = lazy(() => import("./views/editSession"));
+  const NewSession = lazy(() => import("./views/newSession"));
+
+  if (!!params.e) {
+    return <EditSession />;
+  } else if (!!params.s) {
+    if (params.s === "-1") {
+      return <NewSession />;
+    } else {
+      return <VoteSession />;
+    }
+  } else {
+    return <HomeDirectory />;
+  }
+};
