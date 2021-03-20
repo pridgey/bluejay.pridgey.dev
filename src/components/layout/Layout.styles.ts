@@ -15,6 +15,11 @@ export const StyledLayout = styled.main`
   grid-template-columns: min-content 1fr min-content;
   grid-template-areas: "logo title new" "content content content";
   align-items: center;
+  overflow-y: auto;
+
+  @media (max-width: 1000px) {
+    padding: 10px;
+  }
 `;
 
 export const GridArea = styled.div<{

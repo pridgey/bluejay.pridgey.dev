@@ -24,6 +24,7 @@ export const Layout = ({ children }: LayoutProps) => {
       </GridArea>
       <GridArea Area="new">
         <Button
+          Type="Secondary"
           OnClick={(e) =>
             window.location.assign(`${window.location.origin}?s=-1`)
           }

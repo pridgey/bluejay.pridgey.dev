@@ -5,6 +5,10 @@ export const StyledLabel = Styled.label`
     font-weight: 800;
     font-size: 16px;
     text-transform: uppercase;
+
+    @media (max-width: 1000px) {
+        font-size: 14px;
+      }
 `;
 
 export const StyledInput = Styled.input`
@@ -18,4 +22,8 @@ export const StyledInput = Styled.input`
     font-size: 16px;
     color: #0a0808;
     margin-top: 5px;
+
+    @media (max-width: 1000px) {
+        font-size: 14px;
+      }
 `;

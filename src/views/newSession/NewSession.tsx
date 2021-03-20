@@ -1,12 +1,21 @@
 import { KeyboardEvent, useState, useRef } from "react";
 import { StyledNewSession, SessionOptionsContainer } from "./NewSession.styles";
-import { Button, Input, Text } from "./../../components";
+import { Button, Input, Text, Loader } from "./../../components";
+import { useAirtable } from "./../../utilities";
+import { v4 } from "uuid";
 
-export const NewSession = () => {
+type NewSessionProps = {
+  UserID: string;
+};
+
+export const NewSession = ({ UserID }: NewSessionProps) => {
   const [sessionOptions, setSessionOptions] = useState<string[]>([]);
   const [currentError, setCurrentError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const nameRef = useRef<HTMLInputElement>(document.createElement("input"));
+
+  const base = useAirtable();
 
   return (
     <StyledNewSession>
@@ -61,6 +70,7 @@ export const NewSession = () => {
         ))}
       </SessionOptionsContainer>
       <Button
+        Disabled={!nameRef?.current?.value || sessionOptions.length === 0}
         OnClick={() => {
           setCurrentError("");
           if (!nameRef?.current?.value) {
@@ -69,6 +79,45 @@ export const NewSession = () => {
             setCurrentError(
               "You must have voting options for people to vote on"
             );
+          } else {
+            // Do the thing
+            if (base) {
+              setLoading(true);
+              const newSessionID = v4();
+              base("Sessions")
+                .create([
+                  {
+                    fields: {
+                      ID: newSessionID,
+                      Name: nameRef.current.value,
+                      UserID: UserID,
+                    },
+                  },
+                ])
+                .then(() => {
+                  base("Options")
+                    .create(
+                      sessionOptions.map((option) => {
+                        return {
+                          fields: {
+                            ID: v4(),
+                            Name: option
+                              .replace(/'/g, "\\'")
+                              .replace(/"/g, '\\"'),
+                            SessionID: newSessionID,
+                            Score: 0,
+                          },
+                        };
+                      })
+                    )
+                    .catch((err) => console.error(err))
+                    .finally(() => {
+                      window.location.assign(
+                        `${window.location.origin}?s=${newSessionID}`
+                      );
+                    });
+                });
+            }
           }
         }}
         Margin="50px 0px"
@@ -76,6 +125,7 @@ export const NewSession = () => {
         Save Session
       </Button>
       <Text>{currentError}</Text>
+      {loading && <Loader />}
     </StyledNewSession>
   );
 };

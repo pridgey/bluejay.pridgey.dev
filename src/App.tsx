@@ -15,11 +15,11 @@ export const App = () => {
     return <EditSession />;
   } else if (!!params.s) {
     if (params.s === "-1") {
-      return <NewSession />;
+      return <NewSession UserID={userToken} />;
     } else {
-      return <VoteSession />;
+      return <VoteSession SessionID={params.s.toString()} />;
     }
   } else {
-    return <HomeDirectory />;
+    return <HomeDirectory UserID={userToken} />;
   }
 };

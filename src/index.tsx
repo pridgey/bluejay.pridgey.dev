@@ -2,15 +2,18 @@ import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 import reportWebVitals from "./reportWebVitals";
 import { App } from "./App";
-import { Layout } from "./components";
+import { Layout, Loader } from "./components";
+import { AirtableProvider } from "./utilities";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Layout>
-      <Suspense fallback={<div>Loading...</div>}>
-        <App />
-      </Suspense>
-    </Layout>
+    <AirtableProvider>
+      <Layout>
+        <Suspense fallback={<Loader />}>
+          <App />
+        </Suspense>
+      </Layout>
+    </AirtableProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

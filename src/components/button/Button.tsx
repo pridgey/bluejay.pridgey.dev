@@ -2,6 +2,7 @@ import React, { MouseEvent, ReactNode } from "react";
 import { StyledButton } from "./Button.styles";
 
 type ButtonProps = {
+  Disabled?: boolean;
   Type?: "Primary" | "Secondary";
   children: ReactNode;
   Margin?: string;
@@ -9,6 +10,7 @@ type ButtonProps = {
 };
 
 export const Button = ({
+  Disabled = false,
   children,
   Type = "Primary",
   Margin = "0px",
@@ -16,6 +18,7 @@ export const Button = ({
 }: ButtonProps) => {
   return (
     <StyledButton
+      Disabled={Disabled}
       Type={Type}
       Margin={Margin}
       onClick={(e: MouseEvent<HTMLButtonElement>) => OnClick(e)}
