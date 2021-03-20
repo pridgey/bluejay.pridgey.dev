@@ -154,4 +154,7 @@ So I can either:
 2. let the user go through all options, keep the score in state and regrab the options at the end then update all of them
   +: scores only updated when voting is completed  -: more complicated to grab, regrab and update all
 
+3. Don't keep score in the database at all. Simply let the user know their own results via state
+  +: no complicated api issues  -: non-aggregative scores
+
 */
