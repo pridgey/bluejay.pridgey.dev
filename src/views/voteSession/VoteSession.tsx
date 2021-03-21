@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Text, VoteCard } from "./../../components";
 import { GridArea, StyledOr, StyledVoteSession } from "./VoteSession.styles";
-import { useAirtable } from "./../../utilities";
+import { useAirtable, unescapeQuotes } from "./../../utilities";
+import { SessionResults } from "./../sessionResults";
 
 type VoteSessionProps = {
   SessionID: string;
@@ -9,6 +10,11 @@ type VoteSessionProps = {
 
 type SessionOptionFields = {
   SessionID: string;
+  Name: string;
+  Score: number;
+};
+
+type SessionResult = {
   Name: string;
   Score: number;
 };
@@ -24,6 +30,7 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
   const [sessionTitle, setSessionTitle] = useState("Loading...");
   const [sessionOptions, setSessionOptions] = useState<SessionOption[]>([]);
   const [voteCombinations, setVoteCombinations] = useState<number[][]>([]);
+  const [results, setResults] = useState<SessionResult[]>([]);
 
   useEffect(() => {
     if (base) {
@@ -65,7 +72,6 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
               // Sort it randomly
               combinationArray.sort(() => 0.5 - Math.random());
 
-              console.log("combos", combinationArray);
               // An array full of the possible voting combinations
               setVoteCombinations([...combinationArray]);
             });
@@ -75,26 +81,28 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
   }, [base, SessionID]);
 
   const updateOptionStat = (optionIndex: number) => {
-    if (base) {
-      base("Options")
-        .update([
-          {
-            id: sessionOptions[optionIndex].AirtableID,
-            fields: {
-              ...sessionOptions[optionIndex].Fields,
-              Score: sessionOptions[optionIndex].Fields.Score + 1, // this isn't great because we grab the score from the beginning, so multiple votes won't count
-            },
-          },
-        ])
-        .then(() => {
-          // Remove last combo
-          const currentOptions = [...voteCombinations];
-          currentOptions.shift();
-          setVoteCombinations([...currentOptions]);
-        })
-        .catch((err) => console.error(err));
-    }
+    // First update the local state score
+    const currentOptions = sessionOptions;
+    currentOptions[optionIndex].Fields.Score += 1;
+    setSessionOptions([...currentOptions]);
+
+    // Finally remove that combination from state
+    const currentCombos = [...voteCombinations];
+    currentCombos.shift();
+    setVoteCombinations([...currentCombos]);
   };
+
+  useEffect(() => {
+    if (voteCombinations.length === 0) {
+      const optionResults = sessionOptions
+        .sort((a, b) => b.Fields.Score - a.Fields.Score)
+        .map((opt) => ({
+          Name: opt.Fields.Name,
+          Score: opt.Fields.Score,
+        }));
+      setResults([...optionResults]);
+    }
+  }, [voteCombinations]);
 
   return (
     <StyledVoteSession>
@@ -112,10 +120,9 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
         <>
           <GridArea Area="left">
             <VoteCard OnClick={() => updateOptionStat(voteCombinations[0][0])}>
-              {sessionOptions[voteCombinations[0][0]].Fields.Name.replace(
-                /\\'/g,
-                "'"
-              ).replace(/\\"/g, '"')}
+              {unescapeQuotes(
+                sessionOptions[voteCombinations[0][0]].Fields.Name
+              )}
             </VoteCard>
           </GridArea>
           <GridArea Area="or">
@@ -132,14 +139,14 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
           </GridArea>
           <GridArea Area="right">
             <VoteCard OnClick={() => updateOptionStat(voteCombinations[0][1])}>
-              {sessionOptions[voteCombinations[0][1]].Fields.Name.replace(
-                /\\'/g,
-                "'"
-              ).replace(/\\"/g, '"')}
+              {unescapeQuotes(
+                sessionOptions[voteCombinations[0][1]].Fields.Name
+              )}
             </VoteCard>
           </GridArea>
         </>
       )}
+      {!!results.length && <SessionResults Results={results} />}
     </StyledVoteSession>
   );
 };
