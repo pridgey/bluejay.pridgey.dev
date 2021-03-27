@@ -15,7 +15,7 @@ export const Text = ({
   FontFamily = "Montserrat",
   FontSize = 18,
   FontWeight = 400,
-  FontColor = "#fdfcfe",
+  FontColor = "#000",
   Margin = "0px",
 }: TextProps) => {
   return (

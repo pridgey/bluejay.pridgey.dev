@@ -1,23 +1,23 @@
 import styled from "styled-components";
 
 export const StyledVoteSession = styled.div`
-  display: grid;
-  width: 100%;
+  padding: 50px;
   box-sizing: border-box;
-  grid-template-rows: min-content auto;
-  grid-template-columns: 1fr min-content 1fr;
-  grid-template-areas: "title title title" "left or right";
-  gap: 15px;
-  align-items: stretch;
-`;
-
-export const GridArea = styled.div<{ Area: string }>`
-  grid-area: ${(p) => p.Area};
-`;
-
-export const StyledOr = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 1000px) {
+    padding: 10px;
+  }
+`;
+
+export const StyledHeader = styled.header`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 20px;
 `;

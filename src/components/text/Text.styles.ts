@@ -12,6 +12,7 @@ export const StyledText = Styled.p<{
     font-weight: ${(p) => p.FontWeight};
     color: ${(p) => p.FontColor};
     margin: ${(p) => p.Margin};
+    line-height: 1em;
 
     @media (max-width: 1000px) {
       font-size: ${(p) => Math.round(p.FontSize / 1.4)}px;

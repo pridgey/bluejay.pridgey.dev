@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Text, VoteCard } from "./../../components";
-import { GridArea, StyledOr, StyledVoteSession } from "./VoteSession.styles";
+import { Logo, Text, VoteCard } from "./../../components";
+import { StyledVoteSession, StyledHeader } from "./VoteSession.styles";
 import { useAirtable, unescapeQuotes } from "./../../utilities";
 import { SessionResults } from "./../sessionResults";
 
@@ -102,66 +102,56 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
         }));
       setResults([...optionResults]);
     }
+    // eslint-disable-next-line
   }, [voteCombinations]);
 
   return (
     <StyledVoteSession>
-      <GridArea Area="title">
+      <StyledHeader>
+        <Logo Height="70px" Width="70px" />
         <Text
-          Margin="10px 0px"
+          FontFamily="Catamaran"
+          FontSize={60}
+          FontColor="#86a5f5"
+          FontWeight={800}
+          Margin="0px 15px"
+        >
+          {sessionTitle}
+        </Text>
+      </StyledHeader>
+      {!!voteCombinations.length && (
+        <Text
+          Margin="0px 0px 10px 0px"
           FontSize={34}
           FontFamily="Catamaran"
           FontWeight={800}
         >
-          {sessionTitle}
+          You have completed{" "}
+          {(sessionOptions.length / 2) * (sessionOptions.length - 1) -
+            voteCombinations.length}{" "}
+          comparisons and have {voteCombinations.length} more to go!
         </Text>
-      </GridArea>
+      )}
       {!!sessionOptions.length && !!voteCombinations.length && (
         <>
-          <GridArea Area="left">
-            <VoteCard OnClick={() => updateOptionStat(voteCombinations[0][0])}>
-              {unescapeQuotes(
-                sessionOptions[voteCombinations[0][0]].Fields.Name
-              )}
-            </VoteCard>
-          </GridArea>
-          <GridArea Area="or">
-            <StyledOr>
-              <Text
-                FontSize={34}
-                FontFamily="Catamaran"
-                FontWeight={800}
-                Margin="0px 10px"
-              >
-                OR
-              </Text>
-            </StyledOr>
-          </GridArea>
-          <GridArea Area="right">
-            <VoteCard OnClick={() => updateOptionStat(voteCombinations[0][1])}>
-              {unescapeQuotes(
-                sessionOptions[voteCombinations[0][1]].Fields.Name
-              )}
-            </VoteCard>
-          </GridArea>
+          <VoteCard
+            ID={voteCombinations[0][0]}
+            OnClick={() => {
+              updateOptionStat(voteCombinations[0][0]);
+            }}
+          >
+            {unescapeQuotes(sessionOptions[voteCombinations[0][0]].Fields.Name)}
+          </VoteCard>
+
+          <VoteCard
+            ID={voteCombinations[0][1]}
+            OnClick={() => updateOptionStat(voteCombinations[0][1])}
+          >
+            {unescapeQuotes(sessionOptions[voteCombinations[0][1]].Fields.Name)}
+          </VoteCard>
         </>
       )}
       {!!results.length && <SessionResults Results={results} />}
     </StyledVoteSession>
   );
 };
-
-/*
-The scores are grabbed at the very beginning, making it hard to update as they go. 
-So I can either:
-
-1. on vote, re-grab the option, get it's score, then update it
-  +: bit easier to grab and go  -: user never finishes the session, scores might be tainted
-
-2. let the user go through all options, keep the score in state and regrab the options at the end then update all of them
-  +: scores only updated when voting is completed  -: more complicated to grab, regrab and update all
-
-3. Don't keep score in the database at all. Simply let the user know their own results via state
-  +: no complicated api issues  -: non-aggregative scores
-
-*/

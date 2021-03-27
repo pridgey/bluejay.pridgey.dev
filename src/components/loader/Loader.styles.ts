@@ -13,7 +13,10 @@ export const LoaderBackground = Styled.div`
 `;
 
 export const LoaderCard = Styled.div`
-    background-color: #0a0808;
+    background-color: #f0efeb;
+    -webkit-box-shadow: 0px 10px 13px -7px #000000,
+    5px 5px 15px 5px rgba(0, 0, 0, 0);
+  box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
     border-radius: 20px;
     padding: 50px;
     display: flex;
@@ -24,7 +27,7 @@ export const LoaderCard = Styled.div`
 
 const generateKeyframePositions = () => {
   const positionsArray: string[] = [];
-  const positions = Math.round(2 + Math.random() * 4);
+  const positions = Math.round(4 + Math.random() * 4);
 
   for (let j = 0; j <= positions; j++) {
     const percentage = Math.round((100 / positions) * j);
@@ -58,4 +61,7 @@ export const LoaderBubble = Styled.div<{
   p.HSLArray.join(", ")});
     background-size: 600% 600%;
     animation: ${Flow} ${(p) => p.Duration}s ease infinite;
+    -webkit-box-shadow: 0px 10px 13px -7px #000000,
+    5px 5px 15px 5px rgba(0, 0, 0, 0);
+  box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
 `;

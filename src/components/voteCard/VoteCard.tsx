@@ -1,11 +1,30 @@
-import React, { ReactNode } from "react";
+import { useState, useEffect, ReactNode, MouseEvent } from "react";
 import { StyledVoteCard } from "./VoteCard.styles";
 
 type VoteCardProps = {
+  ID: number;
   children: ReactNode;
   OnClick: () => void;
 };
 
-export const VoteCard = ({ children, OnClick }: VoteCardProps) => {
-  return <StyledVoteCard onClick={() => OnClick()}>{children}</StyledVoteCard>;
+export const VoteCard = ({ ID, children, OnClick }: VoteCardProps) => {
+  const [bgImage, setBgImage] = useState("");
+
+  useEffect(() => {
+    setBgImage(
+      `https://source.unsplash.com/1600x900/?${children?.toString()},pattern`
+    );
+  }, [children]);
+
+  return (
+    <StyledVoteCard
+      Background={bgImage}
+      onClick={(event: MouseEvent<HTMLButtonElement>) => {
+        OnClick();
+        event.currentTarget.blur();
+      }}
+    >
+      {children}
+    </StyledVoteCard>
+  );
 };

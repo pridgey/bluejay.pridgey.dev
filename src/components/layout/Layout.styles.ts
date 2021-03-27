@@ -1,33 +1,46 @@
 import styled from "styled-components";
 
-export const StyledLayout = styled.main`
+export const StyledBackdrop = styled.div`
   position: fixed;
   top: 0px;
   bottom: 0px;
   left: 0px;
   right: 0px;
-  background-color: #0a0808;
-  color: #fdfcfe;
-  padding: 40px;
+  background: rgb(218, 215, 205);
+  background: linear-gradient(
+    0deg,
+    rgba(88, 129, 87, 1) 0%,
+    rgba(88, 129, 87, 1) 50%,
+    rgba(218, 215, 205, 1) 50%,
+    rgba(218, 215, 205, 1) 100%
+  );
+`;
+
+export const StyledLayout = styled.div`
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  padding: 15% 10%;
   box-sizing: border-box;
-  display: grid;
-  grid-template-rows: min-content 1fr;
-  grid-template-columns: min-content 1fr min-content;
-  grid-template-areas: "logo title new" "content content content";
+  display: flex;
   align-items: center;
-  overflow-y: auto;
+  justify-content: center;
 
   @media (max-width: 1000px) {
     padding: 10px;
   }
 `;
 
-export const GridArea = styled.div<{
-  Area: string;
-  Width?: string;
-  Height?: string;
-}>`
-  grid-area: ${(p) => p.Area};
-  width: ${(p) => p.Width};
-  height: ${(p) => p.Height};
+export const StyledContent = styled.main`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #f0efeb;
+  padding: 5px 15px;
+  border-radius: 20px;
+  -webkit-box-shadow: 0px 10px 13px -7px #000000,
+    5px 5px 15px 5px rgba(0, 0, 0, 0);
+  box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
 `;

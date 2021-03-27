@@ -1,6 +1,10 @@
-import { KeyboardEvent, useState, useRef } from "react";
-import { StyledNewSession, SessionOptionsContainer } from "./NewSession.styles";
-import { Button, Input, Text, Loader } from "./../../components";
+import { KeyboardEvent, useState, useRef, useEffect } from "react";
+import {
+  StyledNewSession,
+  StyledHeader,
+  SessionOptionsContainer,
+} from "./NewSession.styles";
+import { Button, Input, Text, Logo, Loader } from "./../../components";
 import { useAirtable } from "./../../utilities";
 import { v4 } from "uuid";
 
@@ -12,20 +16,45 @@ export const NewSession = ({ UserID }: NewSessionProps) => {
   const [sessionOptions, setSessionOptions] = useState<string[]>([]);
   const [currentError, setCurrentError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [manyOptionWarning, setmanyOptionWarning] = useState("");
 
   const nameRef = useRef<HTMLInputElement>(document.createElement("input"));
 
   const base = useAirtable();
 
+  useEffect(() => {
+    if (sessionOptions.length >= 10) {
+      const numOfComparisons =
+        (sessionOptions.length / 2) * (sessionOptions.length - 1);
+      setmanyOptionWarning(
+        `Warning: ${sessionOptions.length} options means users will have to vote on ${numOfComparisons} one-on-one comparisons before getting their results.`
+      );
+    } else {
+      setmanyOptionWarning("");
+    }
+  }, [sessionOptions]);
+
   return (
     <StyledNewSession>
+      <StyledHeader>
+        <Logo Height="70px" Width="70px" />
+        <Text
+          FontFamily="Catamaran"
+          FontSize={60}
+          FontColor="#86a5f5"
+          FontWeight={800}
+          Margin="0px 15px"
+        >
+          New Session
+        </Text>
+      </StyledHeader>
       <Text
         Margin="0px 0px 10px 0px"
         FontSize={34}
         FontFamily="Catamaran"
         FontWeight={800}
       >
-        New Voting Session
+        Gathering the requirements
       </Text>
       <Text Margin="10px 0px 20px 0px">
         Let's set up your new round robin voting session using BlueJay. First
@@ -53,6 +82,11 @@ export const NewSession = ({ UserID }: NewSessionProps) => {
           }
         }}
       />
+      {!!manyOptionWarning.length && (
+        <Text FontColor="#9a031e" FontSize={14} Margin="5px 0px">
+          {manyOptionWarning}
+        </Text>
+      )}
       <SessionOptionsContainer>
         {sessionOptions.map((option: string, index: number) => (
           <Button

@@ -6,3 +6,6 @@ export * from "./input";
 export * from "./loader";
 export * from "./tropheySVG";
 export * from "./voteCard";
+export * from "./leftFawn";
+export * from "./rightFawn";
+export * from "./sessionButton";

@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAirtable } from "./../../utilities";
-import { StyledHomeDirectory, HomeBody } from "./HomeDirectory.styles";
-import { Text, TropheySVG } from "./../../components";
+import {
+  StyledHomeDirectory,
+  StyledHeader,
+  StyledSessions,
+} from "./HomeDirectory.styles";
+import { Logo, SessionButton, Text } from "./../../components";
 
 type HomeDirectoryProps = {
   UserID: string;
@@ -28,20 +32,28 @@ export const HomeDirectory = ({ UserID }: HomeDirectoryProps) => {
 
   return (
     <StyledHomeDirectory>
-      <Text FontFamily="Catamaran" FontSize={50} FontWeight={800}>
-        Welcome to BlueJay
-      </Text>
-      <HomeBody>
-        <Text FontFamily="Montserrat" FontSize={22} FontWeight={400}>
-          With BlueJay you can figure out the best song in the world by
-          performing a simple round-robin comparison of many options. Once you
-          set up a session, you can send the link out to friends to ensure you
-          aren't missing any viewpoint. So why wait? Start a new session and
-          prove to everyone that "Toxic" by Brittany Spears is truly the
-          greatest song of all time.
+      <StyledHeader>
+        <Logo Height="70px" Width="70px" />
+        <Text
+          FontFamily="Catamaran"
+          FontSize={60}
+          FontColor="#86a5f5"
+          FontWeight={800}
+          Margin="0px 15px"
+        >
+          BlueJay
         </Text>
-        <TropheySVG Width="40vw" Height="unset" />
-      </HomeBody>
+      </StyledHeader>
+      <StyledSessions>
+        <SessionButton ID="-1" Name="Make New Session +" />
+        {sessions?.map((sess, index) => (
+          <SessionButton
+            ID={sess.ID}
+            Name={sess.Name}
+            key={`session-button-${index}`}
+          />
+        ))}
+      </StyledSessions>
     </StyledHomeDirectory>
   );
 };
