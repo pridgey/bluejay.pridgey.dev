@@ -72,7 +72,10 @@ export const NewSession = ({ UserID }: NewSessionProps) => {
         Label="Voting Options"
         Placeholder="Enter a new option and hit enter"
         OnKeyUp={(e: KeyboardEvent<HTMLInputElement>) => {
-          if (e.key === "Enter" || e.key === ",") {
+          if (
+            (e.key === "Enter" || e.key === ",") &&
+            !!e.currentTarget.value.length
+          ) {
             e.preventDefault();
             const modOptions = sessionOptions;
             modOptions.push(e.currentTarget.value.replace(",", ""));
@@ -129,28 +132,40 @@ export const NewSession = ({ UserID }: NewSessionProps) => {
                   },
                 ])
                 .then(() => {
-                  base("Options")
-                    .create(
-                      sessionOptions.map((option) => {
-                        return {
-                          fields: {
-                            ID: v4(),
-                            Name: option
-                              .replace(/'/g, "\\'")
-                              .replace(/"/g, '\\"'),
-                            SessionID: newSessionID,
-                            Score: 0,
-                          },
-                        };
-                      })
-                    )
-                    .catch((err) => console.error(err))
-                    .finally(() => {
+                  // Create an array of promises
+                  const promiseArray: Promise<any>[] = [];
+
+                  for (let i = 0; i < sessionOptions.length; i += 10) {
+                    // Go in chunks of ten
+                    const arrayChunk = sessionOptions.slice(i, i + 10);
+                    promiseArray.push(
+                      base("Options")
+                        .create(
+                          arrayChunk.map((option) => ({
+                            fields: {
+                              ID: v4(),
+                              Name: option
+                                .replace(/'/g, "\\'")
+                                .replace(/"/g, '\\"'),
+                              SessionID: newSessionID,
+                              Score: 0,
+                            },
+                          }))
+                        )
+                        .catch((err) => console.error(err))
+                    );
+                  }
+
+                  Promise.allSettled(promiseArray)
+                    .then(() => {
+                      // Jump to the session!
                       window.location.assign(
                         `${window.location.origin}?s=${newSessionID}`
                       );
-                    });
-                });
+                    })
+                    .catch((err) => console.error(err));
+                })
+                .catch((err) => console.error(err));
             }
           }
         }}
