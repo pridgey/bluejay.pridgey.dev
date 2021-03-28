@@ -13,6 +13,7 @@ export const StyledVoteCard = styled.button<{ Background: string }>`
   font-weight: 800;
   font-family: "Catamaran", sans-serif;
   cursor: pointer;
+  word-break: break-word;
   border: 0px;
   color: #fdfcfe;
   -webkit-box-shadow: 0px 10px 13px -7px #000000,
@@ -31,7 +32,7 @@ export const StyledVoteCard = styled.button<{ Background: string }>`
   }
 
   @media (max-width: 1000px) {
-    font-size: 40px;
+    font-size: 30px;
 
     &:hover,
     &:focus {
