@@ -7,6 +7,8 @@ export const StyledVoteSession = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: auto;
+  padding-bottom: 150px;
 
   @media (max-width: 1000px) {
     padding: 10px;
