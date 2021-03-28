@@ -12,6 +12,7 @@ export const StyledVoteSession = styled.div`
 
   @media (max-width: 1000px) {
     padding: 10px;
+    padding-bottom: 150px;
   }
 `;
 
