@@ -2,12 +2,11 @@ import { useState, useEffect, ReactNode, MouseEvent } from "react";
 import { StyledVoteCard } from "./VoteCard.styles";
 
 type VoteCardProps = {
-  ID: number;
   children: ReactNode;
   OnClick: () => void;
 };
 
-export const VoteCard = ({ ID, children, OnClick }: VoteCardProps) => {
+export const VoteCard = ({ children, OnClick }: VoteCardProps) => {
   const [bgImage, setBgImage] = useState("");
 
   useEffect(() => {
