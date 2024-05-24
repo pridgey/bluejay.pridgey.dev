@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
 import { Logo, Text, VoteCard } from "./../../components";
 import { StyledVoteSession, StyledHeader } from "./VoteSession.styles";
-import { unescapeQuotes } from "./../../utilities";
+import { unescapeQuotes, usePocketBase } from "./../../utilities";
 import { SessionResults } from "./../sessionResults";
+import { OptionRecord, SessionRecord } from "../../types";
 
 type VoteSessionProps = {
   SessionID: string;
-};
-
-type SessionOptionFields = {
-  SessionID: string;
-  Name: string;
-  Score: number;
 };
 
 type SessionResult = {
@@ -19,69 +14,67 @@ type SessionResult = {
   Score: number;
 };
 
-type SessionOption = {
-  AirtableID: string;
-  Fields: SessionOptionFields;
-};
-
 export const VoteSession = ({ SessionID }: VoteSessionProps) => {
   const [sessionTitle, setSessionTitle] = useState("Loading...");
-  const [sessionOptions, setSessionOptions] = useState<SessionOption[]>([]);
+  const [sessionOptions, setSessionOptions] = useState<OptionRecord[]>([]);
   const [voteCombinations, setVoteCombinations] = useState<number[][]>([]);
   const [results, setResults] = useState<SessionResult[]>([]);
 
-  // useEffect(() => {
-  //   if (base) {
-  //     base("Sessions")
-  //       .select({
-  //         fields: ["ID", "UserID", "Name"],
-  //         filterByFormula: `ID = '${SessionID}'`,
-  //       })
-  //       .all()
-  //       .then((results: Airtable.Records<{}>) => {
-  //         // Parse results into workable array
-  //         const queryResults: any[] = results.map((result) => result.fields);
-  //         setSessionTitle(queryResults[0].Name);
-  //       })
-  //       .then(() => {
-  //         base("Options")
-  //           .select({
-  //             fields: ["SessionID", "Name", "Score"],
-  //             filterByFormula: `SessionID = '${SessionID}'`,
-  //           })
-  //           .all()
-  //           .then((results: Airtable.Records<{}>) => {
-  //             // Parse results into workable array
-  //             const queryResults: any[] = results.map((result) => ({
-  //               AirtableID: result.id,
-  //               Fields: result.fields,
-  //             }));
+  const client = usePocketBase();
 
-  //             // Set Option state
-  //             setSessionOptions([...queryResults]);
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        // Grab the session from the url param
+        const sessionRecordPromise = client
+          .collection<SessionRecord>("bluejay_sessions")
+          .getOne(SessionID);
 
-  //             // generate all possible combinations
-  //             const combinationArray = [];
-  //             for (let i = 0; i < queryResults.length; i++) {
-  //               for (let j = i + 1; j < queryResults.length; j++) {
-  //                 combinationArray.push([i, j]);
-  //               }
-  //             }
-  //             // Sort it randomly
-  //             combinationArray.sort(() => 0.5 - Math.random());
+        // Grab all the options for the session
+        const sessionOptionsPromise = client
+          .collection<OptionRecord>("bluejay_options")
+          .getFullList({
+            filter: `SessionID = '${SessionID}'`,
+          });
 
-  //             // An array full of the possible voting combinations
-  //             setVoteCombinations([...combinationArray]);
-  //           });
-  //       })
-  //       .catch((err) => console.log(err));
-  //   }
-  // }, [base, SessionID]);
+        // Run promises in parallel
+        const [sessionRecord, sessionOptions] = await Promise.all([
+          sessionRecordPromise,
+          sessionOptionsPromise,
+        ]);
 
+        // Set the session title
+        setSessionTitle(sessionRecord.Name);
+        // Set the session options
+        setSessionOptions(sessionOptions);
+
+        // generate all possible combinations
+        const combinationArray = [];
+        for (let i = 0; i < sessionOptions.length; i++) {
+          for (let j = i + 1; j < sessionOptions.length; j++) {
+            combinationArray.push([i, j]);
+          }
+        }
+        // Sort it randomly
+        combinationArray.sort(() => 0.5 - Math.random());
+
+        // An array full of the possible voting combinations
+        setVoteCombinations([...combinationArray]);
+      } catch (err) {
+        console.error("Error fetching session", err);
+        setSessionTitle("Error fetching session");
+      }
+    };
+
+    // Run the call
+    getSession();
+  }, [client, SessionID]);
+
+  // Update the score of the option and remove the combination from the array
   const updateOptionStat = (optionIndex: number) => {
     // First update the local state score
     const currentOptions = sessionOptions;
-    currentOptions[optionIndex].Fields.Score += 1;
+    currentOptions[optionIndex].Score += 1;
     setSessionOptions([...currentOptions]);
 
     // Finally remove that combination from state
@@ -93,10 +86,10 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
   useEffect(() => {
     if (voteCombinations.length === 0) {
       const optionResults = sessionOptions
-        .sort((a, b) => b.Fields.Score - a.Fields.Score)
+        .sort((a, b) => b.Score - a.Score)
         .map((opt) => ({
-          Name: opt.Fields.Name,
-          Score: opt.Fields.Score,
+          Name: opt.Value,
+          Score: opt.Score,
         }));
       setResults([...optionResults]);
     }
@@ -138,14 +131,14 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
               updateOptionStat(voteCombinations[0][0]);
             }}
           >
-            {unescapeQuotes(sessionOptions[voteCombinations[0][0]].Fields.Name)}
+            {unescapeQuotes(sessionOptions[voteCombinations[0][0]].Value)}
           </VoteCard>
 
           <VoteCard
             ID={voteCombinations[0][1]}
             OnClick={() => updateOptionStat(voteCombinations[0][1])}
           >
-            {unescapeQuotes(sessionOptions[voteCombinations[0][1]].Fields.Name)}
+            {unescapeQuotes(sessionOptions[voteCombinations[0][1]].Value)}
           </VoteCard>
         </>
       )}

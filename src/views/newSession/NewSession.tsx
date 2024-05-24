@@ -6,8 +6,7 @@ import {
 } from "./NewSession.styles";
 import { Button, Input, Text, Logo, Loader } from "./../../components";
 import { usePocketBase } from "./../../utilities";
-import { v4 } from "uuid";
-import { SessionRecord } from "../../types";
+import { OptionRecord, SessionRecord } from "../../types";
 
 type NewSessionProps = {
   UserID: string;
@@ -119,6 +118,8 @@ export const NewSession = ({ UserID }: NewSessionProps) => {
               "You must have voting options for people to vote on"
             );
           } else {
+            setLoading(true);
+
             // Create the session record
             const newSessionRecord = await client
               .collection<SessionRecord>("bluejay_sessions")
@@ -127,58 +128,25 @@ export const NewSession = ({ UserID }: NewSessionProps) => {
                 UserToken: UserID,
               });
 
-            console.log("Session Record", newSessionRecord);
+            // Create the options records
+            for (const option of sessionOptions) {
+              try {
+                await client
+                  .collection<OptionRecord>("bluejay_options")
+                  .create({
+                    Value: option.replace(/'/g, "\\'").replace(/"/g, '\\"'),
+                    SessionID: newSessionRecord.id,
+                    Score: 0,
+                  });
+              } catch (err) {
+                console.error("Error creating session option", err);
+              }
+            }
 
-            // // Do the thing
-            // if (base) {
-            //   setLoading(true);
-            //   const newSessionID = v4();
-            //   base("Sessions")
-            //     .create([
-            //       {
-            //         fields: {
-            //           ID: newSessionID,
-            //           Name: nameRef.current.value,
-            //           UserID: UserID,
-            //         },
-            //       },
-            //     ])
-            //     .then(() => {
-            //       // Create an array of promises
-            //       const promiseArray: Promise<any>[] = [];
+            // Redirect to the new session
+            window.location.href = `/?s=${newSessionRecord.id}`;
 
-            //       for (let i = 0; i < sessionOptions.length; i += 10) {
-            //         // Go in chunks of ten
-            //         const arrayChunk = sessionOptions.slice(i, i + 10);
-            //         promiseArray.push(
-            //           base("Options")
-            //             .create(
-            //               arrayChunk.map((option) => ({
-            //                 fields: {
-            //                   ID: v4(),
-            //                   Name: option
-            //                     .replace(/'/g, "\\'")
-            //                     .replace(/"/g, '\\"'),
-            //                   SessionID: newSessionID,
-            //                   Score: 0,
-            //                 },
-            //               }))
-            //             )
-            //             .catch((err) => console.error(err))
-            //         );
-            //       }
-
-            //       Promise.allSettled(promiseArray)
-            //         .then(() => {
-            //           // Jump to the session!
-            //           window.location.assign(
-            //             `${window.location.origin}?s=${newSessionID}`
-            //           );
-            //         })
-            //         .catch((err) => console.error(err));
-            //     })
-            //     .catch((err) => console.error(err));
-            // }
+            setLoading(false);
           }
         }}
         Margin="50px 0px"

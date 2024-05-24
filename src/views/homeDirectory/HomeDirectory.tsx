@@ -14,33 +14,24 @@ type HomeDirectoryProps = {
 
 export const HomeDirectory = ({ UserID }: HomeDirectoryProps) => {
   const client = usePocketBase();
-  const [sessions, updateSessions] = useState<any[]>();
+  const [sessions, updateSessions] = useState<SessionRecord[]>();
 
-  useEffect(() => {
-    const getSessions = async () => {
+  const getSessions = async () => {
+    try {
       const sessionRecords = await client
         .collection<SessionRecord>("bluejay_sessions")
         .getFullList({
           filter: `UserToken = '${UserID}'`,
         });
 
-      console.log("User Sessions", sessionRecords);
-    };
+      updateSessions([...sessionRecords]);
+    } catch (err) {
+      console.error("Error fetching sessions", err);
+    }
+  };
 
+  useEffect(() => {
     getSessions();
-
-    // if (base) {
-    //   base("Sessions")
-    //     .select({
-    //       fields: ["ID", "UserID", "Name"],
-    //       filterByFormula: `UserID = '${UserID}'`,
-    //     })
-    //     .all()
-    //     .then((results: Airtable.Records<{}>) => {
-    //       const queryResults: any[] = results.map((result) => result.fields);
-    //       updateSessions([...queryResults]);
-    //     });
-    // }
   }, [client, UserID]);
 
   return (
@@ -58,12 +49,13 @@ export const HomeDirectory = ({ UserID }: HomeDirectoryProps) => {
         </Text>
       </StyledHeader>
       <StyledSessions>
-        <SessionButton ID="-1" Name="Make New Session +" />
+        <SessionButton ID="-1" Name="Make New Session" />
         {sessions?.map((sess, index) => (
           <SessionButton
-            ID={sess.ID}
+            ID={sess.id}
             Name={sess.Name}
             key={`session-button-${index}`}
+            OnDelete={() => getSessions()}
           />
         ))}
       </StyledSessions>

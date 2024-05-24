@@ -27,6 +27,7 @@ export const StyledSessions = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: row;
+  gap: 16px;
   flex-wrap: wrap;
   padding-bottom: 150px;
   overflow: auto;
