@@ -18,7 +18,7 @@ export const VoteCard = ({ ID, children, OnClick }: VoteCardProps) => {
 
   return (
     <StyledVoteCard
-      Background={bgImage}
+      $background={bgImage}
       onClick={(event: MouseEvent<HTMLButtonElement>) => {
         OnClick();
         event.currentTarget.blur();

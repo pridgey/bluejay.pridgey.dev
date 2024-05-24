@@ -5,8 +5,9 @@ import {
   SessionOptionsContainer,
 } from "./NewSession.styles";
 import { Button, Input, Text, Logo, Loader } from "./../../components";
-import { useAirtable } from "./../../utilities";
+import { usePocketBase } from "./../../utilities";
 import { v4 } from "uuid";
+import { SessionRecord } from "../../types";
 
 type NewSessionProps = {
   UserID: string;
@@ -20,8 +21,9 @@ export const NewSession = ({ UserID }: NewSessionProps) => {
 
   const nameRef = useRef<HTMLInputElement>(document.createElement("input"));
 
-  const base = useAirtable();
+  const client = usePocketBase();
 
+  // Update warning text if options grow large
   useEffect(() => {
     if (sessionOptions.length >= 10) {
       const numOfComparisons =
@@ -108,7 +110,7 @@ export const NewSession = ({ UserID }: NewSessionProps) => {
       </SessionOptionsContainer>
       <Button
         Disabled={!nameRef?.current?.value || sessionOptions.length === 0}
-        OnClick={() => {
+        OnClick={async () => {
           setCurrentError("");
           if (!nameRef?.current?.value) {
             setCurrentError("You can't save a session without a session name");
@@ -117,56 +119,66 @@ export const NewSession = ({ UserID }: NewSessionProps) => {
               "You must have voting options for people to vote on"
             );
           } else {
-            // Do the thing
-            if (base) {
-              setLoading(true);
-              const newSessionID = v4();
-              base("Sessions")
-                .create([
-                  {
-                    fields: {
-                      ID: newSessionID,
-                      Name: nameRef.current.value,
-                      UserID: UserID,
-                    },
-                  },
-                ])
-                .then(() => {
-                  // Create an array of promises
-                  const promiseArray: Promise<any>[] = [];
+            // Create the session record
+            const newSessionRecord = await client
+              .collection<SessionRecord>("bluejay_sessions")
+              .create({
+                Name: nameRef.current.value,
+                UserToken: UserID,
+              });
 
-                  for (let i = 0; i < sessionOptions.length; i += 10) {
-                    // Go in chunks of ten
-                    const arrayChunk = sessionOptions.slice(i, i + 10);
-                    promiseArray.push(
-                      base("Options")
-                        .create(
-                          arrayChunk.map((option) => ({
-                            fields: {
-                              ID: v4(),
-                              Name: option
-                                .replace(/'/g, "\\'")
-                                .replace(/"/g, '\\"'),
-                              SessionID: newSessionID,
-                              Score: 0,
-                            },
-                          }))
-                        )
-                        .catch((err) => console.error(err))
-                    );
-                  }
+            console.log("Session Record", newSessionRecord);
 
-                  Promise.allSettled(promiseArray)
-                    .then(() => {
-                      // Jump to the session!
-                      window.location.assign(
-                        `${window.location.origin}?s=${newSessionID}`
-                      );
-                    })
-                    .catch((err) => console.error(err));
-                })
-                .catch((err) => console.error(err));
-            }
+            // // Do the thing
+            // if (base) {
+            //   setLoading(true);
+            //   const newSessionID = v4();
+            //   base("Sessions")
+            //     .create([
+            //       {
+            //         fields: {
+            //           ID: newSessionID,
+            //           Name: nameRef.current.value,
+            //           UserID: UserID,
+            //         },
+            //       },
+            //     ])
+            //     .then(() => {
+            //       // Create an array of promises
+            //       const promiseArray: Promise<any>[] = [];
+
+            //       for (let i = 0; i < sessionOptions.length; i += 10) {
+            //         // Go in chunks of ten
+            //         const arrayChunk = sessionOptions.slice(i, i + 10);
+            //         promiseArray.push(
+            //           base("Options")
+            //             .create(
+            //               arrayChunk.map((option) => ({
+            //                 fields: {
+            //                   ID: v4(),
+            //                   Name: option
+            //                     .replace(/'/g, "\\'")
+            //                     .replace(/"/g, '\\"'),
+            //                   SessionID: newSessionID,
+            //                   Score: 0,
+            //                 },
+            //               }))
+            //             )
+            //             .catch((err) => console.error(err))
+            //         );
+            //       }
+
+            //       Promise.allSettled(promiseArray)
+            //         .then(() => {
+            //           // Jump to the session!
+            //           window.location.assign(
+            //             `${window.location.origin}?s=${newSessionID}`
+            //           );
+            //         })
+            //         .catch((err) => console.error(err));
+            //     })
+            //     .catch((err) => console.error(err));
+            // }
           }
         }}
         Margin="50px 0px"

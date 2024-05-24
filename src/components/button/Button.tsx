@@ -1,4 +1,4 @@
-import React, { MouseEvent, ReactNode } from "react";
+import { MouseEvent, ReactNode } from "react";
 import { StyledButton } from "./Button.styles";
 
 type ButtonProps = {
@@ -18,9 +18,9 @@ export const Button = ({
 }: ButtonProps) => {
   return (
     <StyledButton
-      Disabled={Disabled}
-      Type={Type}
-      Margin={Margin}
+      $disabled={Disabled}
+      $type={Type}
+      $margin={Margin}
       onClick={(e: MouseEvent<HTMLButtonElement>) => OnClick(e)}
     >
       {children}

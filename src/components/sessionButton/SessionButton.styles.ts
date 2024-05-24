@@ -1,7 +1,9 @@
 import styled from "styled-components";
 
-export const StyledSessionButton = styled.button<{ NewSessionButton: boolean }>`
-  border: 3px solid ${(p) => (p.NewSessionButton ? "#86a5f5" : "#dad7cd")};
+export const StyledSessionButton = styled.button<{
+  $newSessionButton: boolean;
+}>`
+  border: 3px solid ${(p) => (p.$newSessionButton ? "#86a5f5" : "#dad7cd")};
   padding: 15px 25px;
   box-sizing: border-box;
   color: #000;
@@ -15,7 +17,7 @@ export const StyledSessionButton = styled.button<{ NewSessionButton: boolean }>`
   text-align: left;
 
   &:hover {
-    background-color: ${(p) => (p.NewSessionButton ? "#86a5f5" : "#dad7cd")};
+    background-color: ${(p) => (p.$newSessionButton ? "#86a5f5" : "#dad7cd")};
     transition: all 0.1s;
   }
 

@@ -24,9 +24,9 @@ export const Loader = () => {
     <LoaderBackground>
       <LoaderCard>
         <LoaderBubble
-          Angle={Math.round(Math.random() * 360)}
-          Duration={Duration}
-          HSLArray={generateHSLArray()}
+          $angle={Math.round(Math.random() * 360)}
+          $duration={Duration}
+          $hSLArray={generateHSLArray()}
         />
         <Text
           FontFamily="Catamaran"

@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { StyledText } from "./Text.styles";
 
 type TextProps = {
@@ -20,11 +20,11 @@ export const Text = ({
 }: TextProps) => {
   return (
     <StyledText
-      FontFamily={FontFamily}
-      FontSize={FontSize}
-      FontWeight={FontWeight}
-      FontColor={FontColor}
-      Margin={Margin}
+      $fontFamily={FontFamily}
+      $fontSize={FontSize}
+      $fontWeight={FontWeight}
+      $fontColor={FontColor}
+      $margin={Margin}
     >
       {children}
     </StyledText>

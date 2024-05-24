@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const StyledVoteCard = styled.button<{ Background: string }>`
+export const StyledVoteCard = styled.button<{ $background: string }>`
   display: flex;
   width: 100%;
   height: 100%;
@@ -21,7 +21,7 @@ export const StyledVoteCard = styled.button<{ Background: string }>`
   box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
   background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)) 0% 0% /
       cover,
-    url("${(p) => p.Background}") center center;
+    url("${(p) => p.$background}") center center;
 
   &:hover,
   &:focus {

@@ -1,34 +1,47 @@
 import { useState, useEffect } from "react";
-import { useAirtable } from "./../../utilities";
+import { usePocketBase } from "./../../utilities";
 import {
   StyledHomeDirectory,
   StyledHeader,
   StyledSessions,
 } from "./HomeDirectory.styles";
 import { Logo, SessionButton, Text } from "./../../components";
+import { SessionRecord } from "../../types";
 
 type HomeDirectoryProps = {
   UserID: string;
 };
 
 export const HomeDirectory = ({ UserID }: HomeDirectoryProps) => {
-  const base = useAirtable();
+  const client = usePocketBase();
   const [sessions, updateSessions] = useState<any[]>();
 
   useEffect(() => {
-    if (base) {
-      base("Sessions")
-        .select({
-          fields: ["ID", "UserID", "Name"],
-          filterByFormula: `UserID = '${UserID}'`,
-        })
-        .all()
-        .then((results: Airtable.Records<{}>) => {
-          const queryResults: any[] = results.map((result) => result.fields);
-          updateSessions([...queryResults]);
+    const getSessions = async () => {
+      const sessionRecords = await client
+        .collection<SessionRecord>("bluejay_sessions")
+        .getFullList({
+          filter: `UserToken = '${UserID}'`,
         });
-    }
-  }, [base, UserID]);
+
+      console.log("User Sessions", sessionRecords);
+    };
+
+    getSessions();
+
+    // if (base) {
+    //   base("Sessions")
+    //     .select({
+    //       fields: ["ID", "UserID", "Name"],
+    //       filterByFormula: `UserID = '${UserID}'`,
+    //     })
+    //     .all()
+    //     .then((results: Airtable.Records<{}>) => {
+    //       const queryResults: any[] = results.map((result) => result.fields);
+    //       updateSessions([...queryResults]);
+    //     });
+    // }
+  }, [client, UserID]);
 
   return (
     <StyledHomeDirectory>

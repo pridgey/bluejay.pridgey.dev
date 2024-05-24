@@ -1,18 +1,18 @@
 import Styled from "styled-components";
 
 export const StyledButton = Styled.button<{
-  Disabled: boolean;
-  Margin: string;
-  Type: "Primary" | "Secondary";
+  $disabled: boolean;
+  $margin: string;
+  $type: "Primary" | "Secondary";
 }>`
-    color: ${(p) => (p.Type === "Primary" ? "#fdfcfe" : "#86A5F5")};
+    color: ${(p) => (p.$type === "Primary" ? "#fdfcfe" : "#86A5F5")};
     background-color: ${(p) =>
-      p.Disabled
+      p.$disabled
         ? "#6a6a6b"
-        : p.Type === "Primary"
+        : p.$type === "Primary"
         ? "#86A5F5"
         : "transparent"};
-    border: 1px solid ${(p) => (p.Disabled ? "#6a6a6b" : "#86A5F5")};
+    border: 1px solid ${(p) => (p.$disabled ? "#6a6a6b" : "#86A5F5")};
     padding: 10px 15px;
     font-family: "Catamaran", sans-serif;
     border-radius: 15px;
@@ -21,13 +21,13 @@ export const StyledButton = Styled.button<{
     cursor: pointer;
     white-space: nowrap;
     text-transform: uppercase;
-    margin: ${(p) => p.Margin};
+    margin: ${(p) => p.$margin};
 
     &:hover {
         background-color: ${(p) =>
-          p.Type === "Primary" ? "#3964d4" : "#86A5F5"};
+          p.$type === "Primary" ? "#3964d4" : "#86A5F5"};
         border: 1px solid ${(p) =>
-          p.Type === "Primary" ? "#3964d4" : "#86A5F5"};
+          p.$type === "Primary" ? "#3964d4" : "#86A5F5"};
         color: #fdfcfe;
         transition: all 0.3s;
     }

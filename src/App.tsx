@@ -1,9 +1,11 @@
 import { lazy } from "react";
-import { parse } from "query-string";
 import { getUserToken } from "./utilities";
 
 export const App = () => {
-  const params = parse(window.location.search);
+  const params = new URLSearchParams(window.location.search);
+  const editMode = params.has("e");
+  const SessionID = params.get("s");
+
   const userToken = getUserToken();
 
   const HomeDirectory = lazy(() => import("./views/homeDirectory"));
@@ -11,13 +13,13 @@ export const App = () => {
   const EditSession = lazy(() => import("./views/editSession"));
   const NewSession = lazy(() => import("./views/newSession"));
 
-  if (!!params.e) {
+  if (editMode) {
     return <EditSession />;
-  } else if (!!params.s) {
-    if (params.s === "-1") {
+  } else if (!!SessionID) {
+    if (SessionID === "-1") {
       return <NewSession UserID={userToken} />;
     } else {
-      return <VoteSession SessionID={params.s.toString()} />;
+      return <VoteSession SessionID={SessionID.toString()} />;
     }
   } else {
     return <HomeDirectory UserID={userToken} />;

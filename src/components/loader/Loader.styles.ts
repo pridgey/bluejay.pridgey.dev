@@ -50,17 +50,17 @@ const Flow = keyframes`
 `;
 
 export const LoaderBubble = Styled.div<{
-  Angle: number;
-  HSLArray: string[];
-  Duration: number;
+  $angle: number;
+  $hSLArray: string[];
+  $duration: number;
 }>`
     width: 700px;
     height: 50px;
     border-radius: 20px;
-    background: linear-gradient(${(p) => p.Angle}deg, ${(p) =>
-  p.HSLArray.join(", ")});
+    background: linear-gradient(${(p) => p.$angle}deg, ${(p) =>
+  p.$hSLArray.join(", ")});
     background-size: 600% 600%;
-    animation: ${Flow} ${(p) => p.Duration}s ease infinite;
+    animation: ${Flow} ${(p) => p.$duration}s ease infinite;
     -webkit-box-shadow: 0px 10px 13px -7px #000000,
     5px 5px 15px 5px rgba(0, 0, 0, 0);
   box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
