@@ -126,7 +126,6 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
       {!!sessionOptions.length && !!voteCombinations.length && (
         <>
           <VoteCard
-            ID={voteCombinations[0][0]}
             OnClick={() => {
               updateOptionStat(voteCombinations[0][0]);
             }}
@@ -134,10 +133,7 @@ export const VoteSession = ({ SessionID }: VoteSessionProps) => {
             {unescapeQuotes(sessionOptions[voteCombinations[0][0]].Value)}
           </VoteCard>
 
-          <VoteCard
-            ID={voteCombinations[0][1]}
-            OnClick={() => updateOptionStat(voteCombinations[0][1])}
-          >
+          <VoteCard OnClick={() => updateOptionStat(voteCombinations[0][1])}>
             {unescapeQuotes(sessionOptions[voteCombinations[0][1]].Value)}
           </VoteCard>
         </>
