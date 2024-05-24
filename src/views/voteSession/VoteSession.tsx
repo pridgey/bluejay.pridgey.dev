@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Logo, Text, VoteCard } from "./../../components";
 import { StyledVoteSession, StyledHeader } from "./VoteSession.styles";
-import { useAirtable, unescapeQuotes } from "./../../utilities";
+import { unescapeQuotes } from "./../../utilities";
 import { SessionResults } from "./../sessionResults";
 
 type VoteSessionProps = {
@@ -25,60 +25,58 @@ type SessionOption = {
 };
 
 export const VoteSession = ({ SessionID }: VoteSessionProps) => {
-  const base = useAirtable();
-
   const [sessionTitle, setSessionTitle] = useState("Loading...");
   const [sessionOptions, setSessionOptions] = useState<SessionOption[]>([]);
   const [voteCombinations, setVoteCombinations] = useState<number[][]>([]);
   const [results, setResults] = useState<SessionResult[]>([]);
 
-  useEffect(() => {
-    if (base) {
-      base("Sessions")
-        .select({
-          fields: ["ID", "UserID", "Name"],
-          filterByFormula: `ID = '${SessionID}'`,
-        })
-        .all()
-        .then((results: Airtable.Records<{}>) => {
-          // Parse results into workable array
-          const queryResults: any[] = results.map((result) => result.fields);
-          setSessionTitle(queryResults[0].Name);
-        })
-        .then(() => {
-          base("Options")
-            .select({
-              fields: ["SessionID", "Name", "Score"],
-              filterByFormula: `SessionID = '${SessionID}'`,
-            })
-            .all()
-            .then((results: Airtable.Records<{}>) => {
-              // Parse results into workable array
-              const queryResults: any[] = results.map((result) => ({
-                AirtableID: result.id,
-                Fields: result.fields,
-              }));
+  // useEffect(() => {
+  //   if (base) {
+  //     base("Sessions")
+  //       .select({
+  //         fields: ["ID", "UserID", "Name"],
+  //         filterByFormula: `ID = '${SessionID}'`,
+  //       })
+  //       .all()
+  //       .then((results: Airtable.Records<{}>) => {
+  //         // Parse results into workable array
+  //         const queryResults: any[] = results.map((result) => result.fields);
+  //         setSessionTitle(queryResults[0].Name);
+  //       })
+  //       .then(() => {
+  //         base("Options")
+  //           .select({
+  //             fields: ["SessionID", "Name", "Score"],
+  //             filterByFormula: `SessionID = '${SessionID}'`,
+  //           })
+  //           .all()
+  //           .then((results: Airtable.Records<{}>) => {
+  //             // Parse results into workable array
+  //             const queryResults: any[] = results.map((result) => ({
+  //               AirtableID: result.id,
+  //               Fields: result.fields,
+  //             }));
 
-              // Set Option state
-              setSessionOptions([...queryResults]);
+  //             // Set Option state
+  //             setSessionOptions([...queryResults]);
 
-              // generate all possible combinations
-              const combinationArray = [];
-              for (let i = 0; i < queryResults.length; i++) {
-                for (let j = i + 1; j < queryResults.length; j++) {
-                  combinationArray.push([i, j]);
-                }
-              }
-              // Sort it randomly
-              combinationArray.sort(() => 0.5 - Math.random());
+  //             // generate all possible combinations
+  //             const combinationArray = [];
+  //             for (let i = 0; i < queryResults.length; i++) {
+  //               for (let j = i + 1; j < queryResults.length; j++) {
+  //                 combinationArray.push([i, j]);
+  //               }
+  //             }
+  //             // Sort it randomly
+  //             combinationArray.sort(() => 0.5 - Math.random());
 
-              // An array full of the possible voting combinations
-              setVoteCombinations([...combinationArray]);
-            });
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [base, SessionID]);
+  //             // An array full of the possible voting combinations
+  //             setVoteCombinations([...combinationArray]);
+  //           });
+  //       })
+  //       .catch((err) => console.log(err));
+  //   }
+  // }, [base, SessionID]);
 
   const updateOptionStat = (optionIndex: number) => {
     // First update the local state score
